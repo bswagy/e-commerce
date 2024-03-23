@@ -1,63 +1,58 @@
-// Import necessary modules
-const { Sequelize, DataTypes } = require('sequelize');
+// import important parts of sequelize library
+const { Model, DataTypes } = require('sequelize');
+// import our database connection from config.js
+const sequelize = require('../config/connection');
+const { DECIMAL } = require('sequelize');
 
-// Initialize Sequelize with database credentials from environment variables
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-  host: 'localhost',
-  dialect: 'mysql'
-});
+// Initialize Product model (table) by extending off Sequelize's Model class
+class Product extends Model {}
 
-// Define Category model
-const Category = sequelize.define('Category', {
-  category_name: {
-    type: DataTypes.STRING,
-    allowNull: false
+// set up fields and rules for Product model
+Product.init(
+  {
+    // define columns
+    id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      primaryKey: true,
+      autoIncrement: true,
+    },
+
+product_name: {
+ type: DataTypes.STRING,
+ allowNull: false,
+},
+price: {
+  Type: DataTYPES.DECIMAL,
+  allowNull: false,
+  validate: {
+    isDecimal: true
   }
-});
-
-// Define Product model
-const Product = sequelize.define('Product', {
-  product_name: {
-    type: DataTypes.STRING,
-    allowNull: false
+},
+stock: {
+  type: DataTypes.INTEGER,
+  allowNull: false,
+  defaultValue: 10,
+  validates: {
+    isNumeric: true
+  }
+},
+category_id: {
+  type: DataTypes.INTEGER,
+  references: {
+    model:'category',
+    key: 'id',
+  }
+}
   },
-  price: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false
-  },
-  stock: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    defaultValue: 10,
-    validate: {
-      isNumeric: true
-    }
+  {
+    sequelize,
+    timestamps: false,
+    freezeTableName: true,
+    underscored: true,
+    modelName: 'product',
   }
-});
+);
 
-// Define Tag model
-const Tag = sequelize.define('Tag', {
-  tag_name: {
-    type: DataTypes.STRING
-  }
-});
-
-// Define ProductTag model
-const ProductTag = sequelize.define('ProductTag', {});
-
-// Establish associations between models
-Category.hasMany(Product);
-Product.belongsTo(Category);
-
-Product.belongsToMany(Tag, { through: ProductTag });
-Tag.belongsToMany(Product, { through: ProductTag });
-
-// Sync models with the database
-sequelize.sync({ force: true })
-  .then(() => {
-    console.log('Database & tables created!');
-  });
-
-// Export models for use in other parts of the application
-module.exports = { Category, Product, Tag, ProductTag, sequelize };
+module.exports = Product;
 
