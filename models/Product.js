@@ -23,7 +23,7 @@ product_name: {
  allowNull: false,
 },
 price: {
-  Type: DataTYPES.DECIMAL,
+  Type: DataTypes.DECIMAL,
   allowNull: false,
   validate: {
     isDecimal: true
