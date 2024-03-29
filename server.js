@@ -1,20 +1,17 @@
 const express = require('express');
-const { Category, Product, Tag, ProductTag, sequelize } = require('./models');
-const categoryRoutes = require('./routes/category-routes');
-const productRoutes = require('./routes/product-routes');
-const tagRoutes = require('./routes/tag-routes');
-
+const sequelize = require('./config/connection')
 const app = express();
+const routes = require('./routes')
 const PORT = process.env.PORT || 3000;
+
+
 
 // Middleware
 app.use(express.json());
+app.use(express.urlencoded({extended: true}))
 
 // Use routes
-app.use('/api', categoryRoutes);
-app.use('/api', productRoutes);
-app.use('/api', tagRoutes);
-
+app.use(routes)
 // Start server and sync Sequelize models
 sequelize.sync({ force: true })
   .then(() => {
